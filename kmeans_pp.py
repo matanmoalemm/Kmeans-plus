@@ -29,7 +29,6 @@ def join_data(data1,data2):
     data.set_index(0,inplace= True)
     return data
 
-
 def centroids_intializtion(data,k):
     centroids = []
     np.random.seed(1234)
@@ -45,6 +44,7 @@ def centroids_intializtion(data,k):
                 D = np.linalg.norm(centroid-point)
                 if (D < min): min = D
             D_x[int(i)] = min
+
         sum_D = D_x.sum()
         prob = [D_x[int(j)]/sum_D for j in data.index]
         rand_index = np.random.choice(data.index,p = np.array(prob))
@@ -53,6 +53,8 @@ def centroids_intializtion(data,k):
         else: print(int(rand_index))
         
     return centroids
+
+
 
 def main(args):
     max_iter = 300
