@@ -1,7 +1,6 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
-
-#define Max_double 2147483647
+#include <float.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -13,7 +12,7 @@ double EDistance(double *point1, double *point2,int d);
 int converge(double **prev ,double **curr, int curr_itr,int Max_itr, int K , int d, double epsilon);
 double** assign(double** data,double **currClusters,int d,int K, int N);
 void freeArray(double** centroids, int len);
-PyObject* fit(double** centroids, double** data,int d,int k,double eps,int Max_iter);
+PyObject* fit(double** centroids, double** data,int d,int k,double eps,int Max_iter, int DataSize);
 void handleMemoryFail();
 
 
@@ -29,19 +28,21 @@ void handleMemoryFail() {
 double EDistance(double *point1, double *point2,int d){
     int i;
     double sum = 0.0;
+    double dist;
     for (i = 0; i < d; i++){
-      sum += pow(point1[i]-point2[i],2);
+        dist = (point1[i] - point2[i]);
+        sum += (dist * dist);
     }
-    return sqrt(sum);
+    return sum;
 }
 
 
 
 int converge(double **prev ,double **curr, int curr_itr,int Max_itr, int K , int d, double epsilon){
     int i;
-    if (curr_itr > Max_itr) return 1;
+    if (curr_itr >= Max_itr) return 1;
        for (i = 0 ;i < K; i++){
-           if (EDistance(prev[i],curr[i],d) > epsilon) return 0;
+           if (EDistance(prev[i],curr[i],d) > (epsilon * epsilon)) return 0;
     }
     return 1;
     }
@@ -65,7 +66,7 @@ double** assign(double** data, double **currClusters,int d,int K, int N){
     //Assign every x_i to the closest current cluster
     for (i = 0; i < N ; i++){
         data_entry = data[i];
-        minDist = Max_double;
+        minDist = DBL_MAX;
         index = -1;
         for (j = 0 ; j < K ; j++){
             dist = EDistance(data_entry,currClusters[j],d);
@@ -156,7 +157,7 @@ static PyObject* fit_c(PyObject *self, PyObject *args)
     int n = (int)PyList_Size(pyData);
 
 /* This builds the answer ("O" = Convert a C Object to a Python raw object) */
-    return Py_BuildValue("O", fit(centroids,data,d,k,eps,iter,n)); /*  Py_BuildValue(...) returns a PyObject*  */
+    return fit(centroids,data,d,k,eps,iter,n); /*  Py_BuildValue(...) returns a PyObject*  */
 }
 
 
