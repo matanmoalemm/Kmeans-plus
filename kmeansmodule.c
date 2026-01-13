@@ -91,12 +91,12 @@ double** assign(double** data, double **currClusters,int d,int K, int N){
 }
 
 
-void freeArray(double** centroids, int len) {
+void freeArray(double** arr, int len) {
     int i;
     for (i = 0; i < len; i++) {
-        free(centroids[i]);
+        free(arr[i]);
     }
-    free(centroids);
+    free(arr);
 }
 
 
